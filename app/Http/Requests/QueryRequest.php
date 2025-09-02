@@ -24,7 +24,7 @@ class QueryRequest extends FormRequest
         return [
             'record' => 'required|string',
             'type' => 'required|string',
-            'exclude' => 'nullable|boolean',
+            'exclude' => 'nullable|string',
             'nameserver' => 'nullable|string',
             'resolve_cname' => 'nullable|boolean',
             'trace' => 'nullable|boolean',
