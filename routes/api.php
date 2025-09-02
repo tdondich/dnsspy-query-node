@@ -8,9 +8,14 @@ use App\Exceptions\TimeoutException;
 
 Route::get('/query', function (QueryRequest $request) {
     try{
-        dd(resolveDnsRecord($request->record, $request->type, $request->exclude, $request->nameserver, $request->resolve_cname, $request->trace, $request->authority));
+        $response =  resolveDnsRecord($request->record, $request->type, $request->exclude, $request->nameserver, $request->resolve_cname, $request->trace, $request->authority);
+        if($response) {
+            return response()->json($response);
+        } else {
+            return response()->json(['error' => 'No response'], 204);
+        }
     } catch (TimeoutException $e) {
-        return response()->json(['error' => 'Timeout'], 500);
+        return response()->json(['error' => 'Timeout'], 408);
     }
 })->middleware(ValidateApiKey::class);
 
