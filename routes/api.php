@@ -8,7 +8,12 @@ use App\Exceptions\TimeoutException;
 
 Route::get('/query', function (QueryRequest $request) {
     try{
-        $response =  resolveDnsRecord($request->record, $request->type, $request->exclude, $request->nameserver, $request->resolve_cname, $request->trace, $request->authority);
+        $exclude = $request->exclude === null ? false : $request->exclude;
+        $nameserver = $request->nameserver === null ? false : $request->nameserver;
+        $resolve_cname = $request->resolve_cname === null ? false : $request->resolve_cname;
+        $trace = $request->trace === null ? false : $request->trace;
+        $authority = $request->authority === null ? false : $request->authority;
+        $response =  resolveDnsRecord($request->record, $request->type, $exclude, $nameserver, $resolve_cname, $trace, $authority);
         if($response) {
             return response()->json($response);
         } else {
