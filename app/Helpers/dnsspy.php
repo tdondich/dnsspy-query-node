@@ -100,6 +100,21 @@ function getAuthoritativeNameservers($domain)
 
     $output = trim(`$command`);
 
+    # Special case: record isn't deleted, but nameserver just didn't reply
+    # within our timeouts.
+    if (stristr($output, 'connection timed out')) {
+        throw new TimeoutException();
+    }
+
+
+    // Get timing info
+    $pattern = "/^;; Query time: ([0-9]+) msec/im";
+    $timing = [];
+    preg_match_all($pattern, $output, $timing, PREG_SET_ORDER);
+    if (is_array($timing) && count($timing) > 0) {
+        $time = $timing[0][1];
+    }
+
     # Parse the output
     $response_blocks = explode("bytes from", $output);
 
@@ -122,13 +137,18 @@ function getAuthoritativeNameservers($domain)
 
                 sort($arrReturn);
 
-                return $arrReturn;
+                return [
+                    'nameservers' => $arrReturn,
+                    'time' => $time
+                ];
             }
         }
     }
 
-    // Nothing found?
-    return false;
+    return [
+        'nameservers' => [],
+        'time' => $time
+    ];
 }
 
 function resolveCnameRecord($fullrecord, $nameserver)

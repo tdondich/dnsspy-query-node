@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\ValidateApiKey;
 use App\Http\Requests\QueryRequest;
 use App\Exceptions\TimeoutException;
+use App\Http\Requests\AuthoritativeRequest;
 
 Route::get('/query', function (QueryRequest $request) {
     try{
@@ -24,6 +25,13 @@ Route::get('/query', function (QueryRequest $request) {
     }
 })->middleware(ValidateApiKey::class);
 
-Route::get('/test', function () {
-    return 'ok';
-});
+
+Route::get('/authoritative', function (AuthoritativeRequest $request) {
+    try{
+        $response = getAuthoritativeNameservers($request->domain);
+        return response()->json($response);
+    } catch (TimeoutException $e) {
+        return response()->json(['error' => 'Timeout'], 408);
+    }
+})->middleware(ValidateApiKey::class);
+
