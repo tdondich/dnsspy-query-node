@@ -39,7 +39,7 @@ class QueryController extends Controller
                     'code' => $e->getCode(),
                     'error' => \NetDNS2\ENUM\Error::INT_FAILED_SOCKET->label(),
                     'message' => 'Could not connect to nameserver'
-                ], 500);
+                ], 522); // Timeout potentially reaching the origin nameserver
             }
             return response()->json([
                 'code' => $e->getCode(),
