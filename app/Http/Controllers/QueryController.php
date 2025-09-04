@@ -37,15 +37,15 @@ class QueryController extends Controller
             if ($e->getCode() == \NetDNS2\ENUM\Error::INT_FAILED_SOCKET->value) {
                 return response()->json([
                     'code' => $e->getCode(),
-                    'error' => 'Socket error',
+                    'error' => \NetDNS2\ENUM\Error::INT_FAILED_SOCKET->label(),
                     'message' => 'Could not connect to nameserver'
                 ], 500);
             }
             return response()->json([
                 'code' => $e->getCode(),
-                'error' => 'Unknown error',
+                'error' => \NetDNS2\ENUM\Error::from($e->getCode())->name,
                 'message' => $e->getMessage()
-            ], 500);
+            ], 400);
         }
     }
 
