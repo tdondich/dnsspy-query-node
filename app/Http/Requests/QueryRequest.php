@@ -22,13 +22,9 @@ class QueryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'record' => 'required|string',
+            'name' => 'required|string',
             'type' => 'required|string',
-            'exclude' => 'nullable|string',
-            'nameserver' => 'nullable|string',
-            'resolve_cname' => 'nullable|boolean',
-            'trace' => 'nullable|boolean',
-            'authority' => 'nullable|boolean',
+            'nameserver' => 'nullable|ip',
         ];
     }
 }
