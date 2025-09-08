@@ -88,10 +88,18 @@ class QueryController extends Controller
             // if the property is an Enum, get the label
             if($answer->$propName instanceof \BackedEnum) {
                 $results[$propName] = $answer->$propName->label();
+            } else if(is_array($answer->$propName)) {
+                // If the property is an array, iterate through the array (for txt?)
+                $tmp = [];
+                foreach($answer->$propName as $item) {
+                    $tmp[] = $item->__toString();
+                }
+                $results[$propName] = $tmp;
             } else {
                 $results[$propName] = $answer->$propName instanceof \Stringable ? $answer->$propName->__toString() : $answer->$propName;
             }
         }
+        $results['__string'] = $answer->__toString();
         return $results;
     }
 }
