@@ -9,8 +9,26 @@ class QueryController extends Controller
 {
     public function query(QueryRequest $request)
     {
+        // First, we have to fetch the IP address of the requested nameserver.  It may already be 
+        // an IP address, or a potential hostname.  If it's an IP address, go ahead and use it.  If it's 
+        // a hostname, then we need to try and fetch it's ip address using the resolver.
+
+        $nameserver = $request->nameserver;
+        if(filter_var($nameserver, FILTER_VALIDATE_IP)) {
+            $nameserver = [$nameserver];
+        } else {
+            $result = $this->resolveNameserver($nameserver);
+            if(!$result) {
+                return response()->json([
+                    'code' => 404,
+                    'error' => 'Could not resolve nameserver',
+                    'message' => 'Could not resolve nameserver'
+                ], 400);
+            }
+        }
+
         $resolver = new \NetDNS2\Resolver();
-        $resolver->nameservers = [$request->nameserver ?? '127.0.0.1'];
+        $resolver->nameservers = $nameserver;
         try {
             $result =  $resolver->query($request->name, $request->type);
 
@@ -101,5 +119,22 @@ class QueryController extends Controller
         }
         $results['__string'] = $answer->__toString();
         return $results;
+    }
+
+    private function resolveNameserver($nameserver)
+    {
+        $resolver = new \NetDNS2\Resolver();
+        $resolver->nameservers = ['127.0.0.1'];
+
+        try {
+            $result = $resolver->query($nameserver, 'A');
+            if(count($result->answer) > 0) {
+                return $result->answer[0]->address;
+            } else {
+                return null;
+            }
+        } catch (\NetDNS2\Exception $e) {
+            return null;
+        }
     }
 }

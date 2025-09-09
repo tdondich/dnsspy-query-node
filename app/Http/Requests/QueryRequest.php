@@ -24,7 +24,7 @@ class QueryRequest extends FormRequest
         return [
             'name' => 'required|string',
             'type' => 'required|string',
-            'nameserver' => 'nullable|ip',
+            'nameserver' => 'nullable|string',
         ];
     }
 }
