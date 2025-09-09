@@ -14,18 +14,23 @@ class QueryController extends Controller
         // a hostname, then we need to try and fetch it's ip address using the resolver.
 
         $nameserver = $request->nameserver;
-        if(filter_var($nameserver, FILTER_VALIDATE_IP)) {
-            $nameserver = [$nameserver];
-        } else {
-            $result = $this->resolveNameserver($nameserver);
-            if(!$result) {
-                return response()->json([
-                    'code' => 404,
-                    'error' => 'Could not resolve nameserver',
-                    'message' => 'Could not resolve nameserver'
-                ], 400);
+        if(!$nameserver || $nameserver == '') {
+            $nameserver = ['127.0.0.1'];
+        }
+        else {
+            if(filter_var($nameserver, FILTER_VALIDATE_IP)) {
+                $nameserver = [$nameserver];
+            } else {
+                $result = $this->resolveNameserver($nameserver);
+                if(!$result) {
+                    return response()->json([
+                        'code' => 404,
+                        'error' => 'Could not resolve nameserver',
+                        'message' => 'Could not resolve nameserver'
+                    ], 400);
+                }
+                $nameserver = [$result];
             }
-            $nameserver = [$result];
         }
 
         $resolver = new \NetDNS2\Resolver();
