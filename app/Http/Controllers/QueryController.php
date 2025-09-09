@@ -25,6 +25,7 @@ class QueryController extends Controller
                     'message' => 'Could not resolve nameserver'
                 ], 400);
             }
+            $nameserver = [$result];
         }
 
         $resolver = new \NetDNS2\Resolver();
