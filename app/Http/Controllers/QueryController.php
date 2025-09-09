@@ -130,7 +130,7 @@ class QueryController extends Controller
         try {
             $result = $resolver->query($nameserver, 'A');
             if(count($result->answer) > 0) {
-                return $result->answer[0]->address;
+                return $result->answer[0]->address->__toString();
             } else {
                 return null;
             }
