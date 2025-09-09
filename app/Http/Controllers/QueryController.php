@@ -35,6 +35,7 @@ class QueryController extends Controller
 
         $resolver = new \NetDNS2\Resolver();
         $resolver->nameservers = $nameserver;
+        $resolver->timeout = 3; // 3 seconds
         try {
             $result =  $resolver->query($request->name, $request->type);
 
@@ -127,10 +128,16 @@ class QueryController extends Controller
         return $results;
     }
 
+    /** We cache nameserver ip addresses based on ttl */
     private function resolveNameserver($nameserver)
     {
         $resolver = new \NetDNS2\Resolver();
         $resolver->nameservers = ['127.0.0.1'];
+        $resolver->cache_type = \NetDNS2\Cache::CACHE_TYPE_FILE;
+        $resolver->cache_options = [
+            'file' => '/tmp/nameserver-cache',
+            'size' => 1000000,
+        ];
 
         try {
             $result = $resolver->query($nameserver, 'A');
